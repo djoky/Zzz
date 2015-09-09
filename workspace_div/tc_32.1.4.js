@@ -14,6 +14,7 @@ casper.test.begin("Display character variables with datatype 'logical' in worksp
     var functions = require(fs.absolute('basicfunctions'));
     var notebookid;//to get the notebook id
 	var input_content="a<-TRUE"; // Logical variable initialisation
+    
     casper.start(rcloud_url, function () {
         casper.page.injectJs('jquery-1.10.2.js');
     });
@@ -29,9 +30,7 @@ casper.test.begin("Display character variables with datatype 'logical' in worksp
         this.wait(9000);
         console.log("validating that the Main page has got loaded properly by detecting if some of its elements are visible. Here we are checking for Shareable Link and Logout options");
         functions.validation(casper);
-        this.wait(4000);
-        
-
+        this.wait(4000);       
     });
     
     casper.then(function(){
@@ -53,14 +52,24 @@ casper.test.begin("Display character variables with datatype 'logical' in worksp
 		functions.addcontentstocell(casper, input_content);
     	this.wait(5000);
 	});
-	casper.then(function(){
-		casper.evaluate(function () {
+	
+	casper.then(function () {
+        if (this.visible('#enviewer-body > table:nth-child(1) > tr:nth-child(1) > th:nth-child(1)')) {
+            console.log("Workspace div is open");
+        } else {
+			console.log('Workspace div is closed hence opening it');
+            casper.evaluate(function () {
                 $('#accordion-right .icon-sun').click();
-
-            });		
-        this.wait(4000);
+            });
+        }
+        this.wait(5000);
+    });
+    
+    casper.then(function () {
+        this.wait(5000);
 		this.test.assertSelectorHasText({ type: 'css', path: '#enviewer-body > table:nth-child(1) > tr:nth-child(2) > td:nth-child(2)'},"logical","Displayed character variables with datatype 'logical' in workspace div");
 	});
+	
 	casper.run(function () {
         test.done();
     });

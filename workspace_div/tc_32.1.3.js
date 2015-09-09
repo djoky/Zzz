@@ -5,7 +5,7 @@ Description:    This is a casperjs automated test script for showing that worksp
 
 
 
-casper.test.begin("Display character variables with datatype 'character' in workspace div", 7, function suite(test) {
+casper.test.begin("Display character variables with datatype 'character' in workspace div", 6, function suite(test) {
 
     var x = require('casper').selectXPath;
     var github_username = casper.cli.options.username;
@@ -14,6 +14,7 @@ casper.test.begin("Display character variables with datatype 'character' in work
     var functions = require(fs.absolute('basicfunctions'));
     var notebookid;//to get the notebook id
 	var input_content="a<-'sanket'"; // character variable initialisation
+    
     casper.start(rcloud_url, function () {
         casper.page.injectJs('jquery-1.10.2.js');
     });
@@ -54,20 +55,23 @@ casper.test.begin("Display character variables with datatype 'character' in work
     	this.wait(5000);
 	});
 	
-	casper.then(function(){
-		if(this.test.assertVisible({type:'xpath', path:".//*[@id='enviewer-body']/table/tr[1]/th"}))
-		{
-			console.log( "Workspace div is alredy open");
-		}else
-		{
-			console.log("Workspace div is not opened, Hence opening it");
-			casper.evaluate(function () {
+	casper.then(function () {
+        if (this.visible('#enviewer-body > table:nth-child(1) > tr:nth-child(1) > th:nth-child(1)')) {
+            console.log("Workspace div is open");
+        } else {
+			console.log('Workspace div is closed hence opening it');
+            casper.evaluate(function () {
                 $('#accordion-right .icon-sun').click();
-			});	
-		}
-		this.wait(4000);
+            });
+        }
+        this.wait(5000);
+    });
+    
+    casper.then(function () {
+        this.wait(5000);
 		this.test.assertSelectorHasText({ type: 'css', path: '#enviewer-body > table:nth-child(1) > tr:nth-child(2) > td:nth-child(2)'},"character","character variables with datatype 'character' is displayed in workspace div");
 	});
+	
 	casper.run(function () {
         test.done();
     });

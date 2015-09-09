@@ -13,6 +13,7 @@ casper.test.begin("Display all variables in workspace div", 6, function suite(te
     var functions = require(fs.absolute('basicfunctions'));
     var notebookid;//to get the notebook id
 	var input_content="a<-12\nb<-12\nd<-20\ne<-20\nf<-10\ng<-25\nj<-30"; // variable initialisation
+    
     casper.start(rcloud_url, function () {
         casper.page.injectJs('jquery-1.10.2.js');
     });
@@ -46,12 +47,20 @@ casper.test.begin("Display all variables in workspace div", 6, function suite(te
     	this.wait(5000);
 	});
 	
-	casper.then(function(){
-		casper.evaluate(function () {
+	casper.then(function () {
+        if (this.visible('#enviewer-body > table:nth-child(1) > tr:nth-child(1) > th:nth-child(1)')) {
+            console.log("Workspace div is open");
+        } else {
+			console.log('Workspace div is closed hence opening it');
+            casper.evaluate(function () {
                 $('#accordion-right .icon-sun').click();
-			});
+            });
+        }
+        this.wait(5000);
     });
-	casper.then(function(){
+    
+    casper.then(function () {
+        this.wait(5000);
 		this.test.assertVisible({ type:'css',path:'#enviewer-scroller'},'scroll bar exists');
 	});
 	

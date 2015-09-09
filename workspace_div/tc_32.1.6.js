@@ -4,7 +4,7 @@ Description: This is a casperjs automated test script for showing that workspace
 */
 
 
-casper.test.begin("Workspace div will be empty after page reload", 7, function suite(test) {
+casper.test.begin("Workspace div will be empty after page reload", 9, function suite(test) {
 
     var x = require('casper').selectXPath;
     var github_username = casper.cli.options.username;
@@ -57,24 +57,44 @@ casper.test.begin("Workspace div will be empty after page reload", 7, function s
     	this.wait(5000);
 	});
 	
-	casper.then(function(){		
-		casper.evaluate(function () {
+	casper.then(function () {
+        if (this.visible('#enviewer-body > table:nth-child(1) > tr:nth-child(1) > th:nth-child(1)')) {
+            console.log("Workspace div is open");
+        } else {
+            console.log('Workspace div is closed hence opening it');
+            casper.evaluate(function () {
                 $('#accordion-right .icon-sun').click();
             });
-		this.wait(4000);
+        }
+        this.wait(5000);
+    });
+
+    casper.then(function () {
+        this.wait(5000);
 		this.test.assertVisible({ type: 'css', path: '#enviewer-body>table>tr>td' }, 'variable is displayed');
      });
      
     casper.then(function(){
 		this.reload();
 	 });   
-	 casper.then(function(){
-		 functions.validation(casper)	
-         this.wait(5000);
-         casper.evaluate(function () {
+	 
+	 casper.then(function () {
+		 functions.validation(casper);
+		 
+        if (this.visible('#enviewer-body > table:nth-child(1) > tr:nth-child(1) > th:nth-child(1)')) {
+            console.log("Workspace div is open");
+        } else {
+            console.log('Workspace div is closed hence opening it');
+            casper.evaluate(function () {
                 $('#accordion-right .icon-sun').click();
-         });
-         this.test.assertNotVisible({ type: 'css', path: '#enviewer-body-wrapper' }, 'workspace div is empty');
+            });
+        }
+        this.wait(5000);
+    });
+
+    casper.then(function () {
+        this.wait(5000);       
+         this.test.assertNotVisible({ type: 'css', path: '#enviewer-body>table>tr>td' }, 'workspace div is empty');
 	 });
 	
 	casper.run(function () {
